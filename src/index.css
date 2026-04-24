@@ -1,0 +1,222 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 20 14 5%;
+    --foreground: 35 20 90%;
+    --card: 20 10 8%;
+    --card-foreground: 35 20 90%;
+    --popover: 20 10 8%;
+    --popover-foreground: 35 20 90%;
+    --primary: 38 40 60%;
+    --primary-foreground: 20 14 5%;
+    --secondary: 25 12 12%;
+    --secondary-foreground: 35 20 90%;
+    --muted: 25 10 15%;
+    --muted-foreground: 30 10 55%;
+    --accent: 38 40 60%;
+    --accent-foreground: 20 14 5%;
+    --destructive: 0 40 60%;
+    --destructive-foreground: 35 20 90%;
+    --border: 25 15 15%;
+    --input: 25 15 15%;
+    --ring: 38 40 40%;
+    --radius: 0.25rem;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #0c0a09;
+    color: #e8e2d9;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: #c9a96e;
+    color: #0c0a09;
+  }
+}
+
+@layer components {
+  .resp-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .resp-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+  }
+  .sticky-footer-inner {
+    max-width: 1200px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+  }
+  .footer-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .care-chips {
+    display: flex;
+    gap: 6px;
+  }
+  .shopper-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+  }
+  .global-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .checkout-modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+  }
+}
+
+@layer utilities {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Personal Shopper shake animation */
+@keyframes shopperShake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-4px) rotate(-1deg); }
+  20% { transform: translateX(4px) rotate(1deg); }
+  30% { transform: translateX(-3px) rotate(-0.5deg); }
+  40% { transform: translateX(3px) rotate(0.5deg); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(2px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+  90% { transform: translateX(0); }
+}
+
+/* Pre-click attention pulse on Personal Shopper button */
+@keyframes shopperPulse {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(201,169,110,0.4);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 0 8px rgba(201,169,110,0);
+    transform: scale(1.03);
+  }
+}
+
+@keyframes shopperGlow {
+  0%, 100% { 
+    border-color: rgba(201,169,110,0.3);
+    background: rgba(201,169,110,0.1);
+  }
+  50% { 
+    border-color: rgba(201,169,110,0.8);
+    background: rgba(201,169,110,0.2);
+  }
+}
+
+/* Auto-play shake on load */
+.shopper-auto-shake {
+  animation: shopperShake 0.5s ease-in-out 3, shopperPulse 2s ease-in-out 3;
+}
+
+/* Fixed footer compensation */
+body {
+  padding-bottom: 80px;
+}
+@media (max-width: 1023px) {
+  .resp-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+  .resp-container {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+  .sticky-footer-inner {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+}
+
+/* ===== MOBILE <=767px ===== */
+@media (max-width: 767px) {
+  .resp-grid-2 {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .resp-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+  .sticky-footer-inner {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .sticky-footer-inner > div:first-child {
+    text-align: center;
+  }
+  .footer-right {
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .care-chips button {
+    padding: 6px 10px !important;
+    min-width: 56px !important;
+  }
+  .shopper-footer {
+    gap: 6px;
+  }
+  .global-controls {
+    bottom: 10px !important;
+    right: 10px !important;
+    gap: 6px !important;
+  }
+  .checkout-modal {
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+  }
+
+  body {
+    padding-bottom: 100px !important;
+  }
+  .floating-nav {
+    padding: 8px 10px !important;
+  }
+  .floating-nav .nav-brand-text {
+    display: none !important;
+  }
+  .floating-nav .nav-buttons button {
+    padding: 5px 8px !important;
+    font-size: 10px !important;
+  }
+  .floating-nav .nav-spacer {
+    display: none !important;
+  }
+}
