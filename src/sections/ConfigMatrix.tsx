@@ -33,6 +33,9 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
   const [unitCount, setUnitCount] = useState(2);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [shopperOpen, setShopperOpen] = useState(false);
+  const [isCompactFooter, setIsCompactFooter] = useState(false);
+  const [showCareMenu, setShowCareMenu] = useState(false);
+  const [showShopperTray, setShowShopperTray] = useState(false);
 
   const sectionRef = useRef<HTMLDivElement>(null);
   const hasChangedChip = useRef(false);
@@ -138,6 +141,27 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
     if (!hasChangedChip.current) { hasChangedChip.current = true; return; }
     setCpuUpgraded(false); setMemoryIdx(0); setStorageIdx(0);
   }, [chipIdx]);
+
+  useEffect(() => {
+    const onResize = () => {
+      const compact = window.innerWidth <= 1023;
+      setIsCompactFooter(compact);
+      if (!compact) {
+        setShowCareMenu(false);
+        setShowShopperTray(false);
+      }
+    };
+
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const careTiers = [
+    { id: 'basic', label: 'Care', color: '#8b7355', accentBg: 'rgba(139,115,85,0.15)' },
+    { id: 'plus', label: 'Care+', color: '#c9a96e', accentBg: 'rgba(201,169,110,0.15)' },
+    { id: 'pro', label: 'Care Pro', color: '#7cb87c', accentBg: 'rgba(124,184,124,0.15)' },
+  ] as const;
 
   const getMemoryLockMessage = () => {
     if (chip.id === 'm4-max' && !cpuUpgraded) return '14-core CPU locked to 36GB. Upgrade CPU for more.';
@@ -313,7 +337,11 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
       <div className="site-footer" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         background: 'rgba(12,10,9,0.95)', backdropFilter: 'blur(20px)',
-        borderTop: '1px solid #2a2522', padding: '16px 40px', zIndex: 50,
+        borderTop: '1px solid #2a2522',
+        padding: isCompactFooter
+          ? '12px 12px calc(12px + env(safe-area-inset-bottom, 0px))'
+          : '16px 40px',
+        zIndex: 50,
         display: 'flex', justifyContent: 'center',
       }}>
         <div className="sticky-footer-inner">
@@ -327,7 +355,7 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
                 {formatPrice(totalPrice)}
               </span>
               {carePrice > 0 && <span style={{ fontSize: '14px', color: '#c9a96e' }}>+ {formatPrice(carePrice)}/yr {t('footer.care')}</span>}
-              {!shopperOpen && (
+              {!isCompactFooter && !shopperOpen && (
                 <button
                   type="button"
                   onClick={() => setShopperOpen(true)}
@@ -345,118 +373,239 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
                   <Sparkles size={12} /> Personal Shopper
                 </button>
               )}
+              {isCompactFooter && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowShopperTray((prev) => !prev);
+                    setShowCareMenu(false);
+                  }}
+                  aria-label="Toggle Personal Shopper"
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '6px',
+                    border: `1px solid ${showShopperTray ? '#c9a96e' : 'rgba(201,169,110,0.3)'}`,
+                    background: showShopperTray ? 'rgba(201,169,110,0.2)' : 'rgba(201,169,110,0.12)',
+                    color: '#c9a96e',
+                    cursor: 'pointer',
+                    marginLeft: '8px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Sparkles size={14} />
+                </button>
+              )}
             </div>
           </div>
 
+          {isCompactFooter && showShopperTray && (
+            <div style={{
+              width: '100%',
+              padding: '10px',
+              background: '#161412',
+              border: '1px solid #2a2522',
+              borderRadius: '8px',
+            }}>
+              <PersonalShopper
+                onAction={handleShopperAction}
+                onClose={() => setShowShopperTray(false)}
+              />
+            </div>
+          )}
+
+          {isCompactFooter && showCareMenu && (
+            <div style={{
+              width: '100%',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gap: '8px',
+              padding: '10px',
+              background: '#161412',
+              border: '1px solid #2a2522',
+              borderRadius: '8px',
+            }}>
+              {careTiers.map((tier) => {
+                const isSelected = selectedCare === tier.id;
+                const yearlyPrice = tier.id === 'basic' ? 0 : (tier.id === 'plus' ? 299 : 599) * unitCount;
+                return (
+                  <button
+                    key={tier.id}
+                    type="button"
+                    onClick={() => {
+                      if (onSelectCare) {
+                        onSelectCare(isSelected ? null : tier.id);
+                      }
+                      setShowCareMenu(false);
+                    }}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '2px',
+                      padding: '8px 10px',
+                      background: isSelected ? tier.accentBg : 'transparent',
+                      border: `1.5px solid ${isSelected ? tier.color : '#2a2522'}`,
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: isSelected ? tier.color : '#8b7355',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}>
+                      {tier.label}
+                    </span>
+                    <span style={{
+                      fontSize: '9px',
+                      color: isSelected ? (tier.id === 'basic' ? '#7cb87c' : tier.color) : '#5a5045',
+                      fontWeight: 500,
+                    }}>
+                      {yearlyPrice === 0 ? 'Included' : `+${formatPrice(yearlyPrice)}/yr`}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           {/* Right side: Personal Shopper or Normal Controls */}
-          {shopperOpen ? (
+          {!isCompactFooter && shopperOpen ? (
             <PersonalShopper
               onAction={handleShopperAction}
               onClose={() => setShopperOpen(false)}
             />
           ) : (
             <div className="footer-right" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
-              {/* Care tier chips */}
-              <div className="care-chips" style={{ display: 'flex', gap: '6px' }}>
-                {[
-                  { id: 'basic', label: 'Care', color: '#8b7355', accentBg: 'rgba(139,115,85,0.15)' },
-                  { id: 'plus', label: 'Care+', color: '#c9a96e', accentBg: 'rgba(201,169,110,0.15)' },
-                  { id: 'pro', label: 'Care Pro', color: '#7cb87c', accentBg: 'rgba(124,184,124,0.15)' },
-                ].map((tier) => {
-                  const isSelected = selectedCare === tier.id;
-                  const yearlyPrice = tier.id === 'basic' ? 0 : (tier.id === 'plus' ? 299 : 599) * unitCount;
-                  return (
-                    <button
-                      key={tier.id}
-                      type="button"
-                      onClick={() => {
-                        if (onSelectCare) {
-                          onSelectCare(isSelected ? null : tier.id);
-                        }
-                      }}
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '2px',
-                        padding: '8px 14px',
-                        background: isSelected ? tier.accentBg : 'transparent',
-                        border: `1.5px solid ${isSelected ? tier.color : '#2a2522'}`,
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontFamily: 'inherit',
-                        transition: 'all 0.2s ease',
-                        minWidth: '72px',
-                        position: 'relative',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (!isSelected) e.currentTarget.style.borderColor = '#3d3630';
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isSelected) e.currentTarget.style.borderColor = '#2a2522';
-                      }}
-                    >
-                      <span style={{
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        color: isSelected ? tier.color : '#8b7355',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                      }}>
-                        {tier.label}
-                      </span>
-                      <span style={{
-                        fontSize: '10px',
-                        color: isSelected ? (tier.id === 'basic' ? '#7cb87c' : tier.color) : '#5a5045',
-                        fontWeight: 500,
-                      }}>
-                        {yearlyPrice === 0 ? 'Included' : `+${formatPrice(yearlyPrice)}/yr`}
-                      </span>
-                      {isSelected && (
+              {isCompactFooter ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCareMenu((prev) => !prev);
+                    setShowShopperTray(false);
+                  }}
+                  aria-label="Toggle care plans"
+                  style={{
+                    width: '38px',
+                    height: '38px',
+                    borderRadius: '6px',
+                    background: showCareMenu ? 'rgba(124,184,124,0.2)' : 'rgba(124,184,124,0.12)',
+                    border: `1px solid ${showCareMenu ? '#7cb87c' : 'rgba(124,184,124,0.3)'}`,
+                    color: '#7cb87c',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Lock size={15} />
+                </button>
+              ) : (
+                <div className="care-chips" style={{ display: 'flex', gap: '6px' }}>
+                  {careTiers.map((tier) => {
+                    const isSelected = selectedCare === tier.id;
+                    const yearlyPrice = tier.id === 'basic' ? 0 : (tier.id === 'plus' ? 299 : 599) * unitCount;
+                    return (
+                      <button
+                        key={tier.id}
+                        type="button"
+                        onClick={() => {
+                          if (onSelectCare) {
+                            onSelectCare(isSelected ? null : tier.id);
+                          }
+                        }}
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '2px',
+                          padding: '8px 14px',
+                          background: isSelected ? tier.accentBg : 'transparent',
+                          border: `1.5px solid ${isSelected ? tier.color : '#2a2522'}`,
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                          transition: 'all 0.2s ease',
+                          minWidth: '72px',
+                          position: 'relative',
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) e.currentTarget.style.borderColor = '#3d3630';
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) e.currentTarget.style.borderColor = '#2a2522';
+                        }}
+                      >
                         <span style={{
-                          position: 'absolute',
-                          top: '-5px',
-                          right: '-5px',
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          background: tier.color,
-                          border: '2px solid rgba(12,10,9,0.95)',
-                        }} />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: isSelected ? tier.color : '#8b7355',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                        }}>
+                          {tier.label}
+                        </span>
+                        <span style={{
+                          fontSize: '10px',
+                          color: isSelected ? (tier.id === 'basic' ? '#7cb87c' : tier.color) : '#5a5045',
+                          fontWeight: 500,
+                        }}>
+                          {yearlyPrice === 0 ? 'Included' : `+${formatPrice(yearlyPrice)}/yr`}
+                        </span>
+                        {isSelected && (
+                          <span style={{
+                            position: 'absolute',
+                            top: '-5px',
+                            right: '-5px',
+                            width: '12px',
+                            height: '12px',
+                            borderRadius: '50%',
+                            background: tier.color,
+                            border: '2px solid rgba(12,10,9,0.95)',
+                          }} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Explore plans anchor */}
-              <button
-                type="button"
-                onClick={() => {
-                  const el = document.getElementById('support');
-                  if (el) el.scrollIntoView({ behavior: 'smooth' });
-                }}
-                style={{
-                  fontSize: '11px',
-                  color: '#8b7355',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontFamily: 'inherit',
-                  textDecoration: 'underline',
-                  textUnderlineOffset: '3px',
-                  textDecorationColor: 'rgba(139,115,85,0.3)',
-                  transition: 'color 0.2s ease',
-                  whiteSpace: 'nowrap',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#c9a96e'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = '#8b7355'; }}
-              >
-                Explore plans
-              </button>
+              {!isCompactFooter && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('support');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  style={{
+                    fontSize: '11px',
+                    color: '#8b7355',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'inherit',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                    textDecorationColor: 'rgba(139,115,85,0.3)',
+                    transition: 'color 0.2s ease',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = '#c9a96e'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = '#8b7355'; }}
+                >
+                  Explore plans
+                </button>
+              )}
 
               {/* Divider */}
-              <div style={{ width: '1px', height: '32px', background: '#2a2522', margin: '0 4px' }} />
+              {!isCompactFooter && <div style={{ width: '1px', height: '32px', background: '#2a2522', margin: '0 4px' }} />}
 
               {/* Add to Bag */}
               <button onClick={() => setCheckoutOpen(true)} style={{

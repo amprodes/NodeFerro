@@ -57,6 +57,7 @@ export default function CloudVsLocal({ config }: Props) {
   const [showAll, setShowAll] = useState(false);
   const [activeSubview, setActiveSubview] = useState<'models' | 'savings'>('models');
   const [expandedModel, setExpandedModel] = useState<string | null>(null);
+  const [isCompact, setIsCompact] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { t, locale, formatPrice } = useAppContext();
@@ -95,6 +96,13 @@ export default function CloudVsLocal({ config }: Props) {
   const cloudMonthly = clusterReplacement.tier.cloudPriceMonthly * unitCount;
   const fiveYearCloud = cloudMonthly * 60;
   const fiveYearSavings = fiveYearCloud - totalPrice;
+
+  useEffect(() => {
+    const onResize = () => setIsCompact(window.innerWidth <= 1023);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -156,7 +164,7 @@ export default function CloudVsLocal({ config }: Props) {
 
       {/* Key metrics */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 40px', marginBottom: '40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isCompact ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, 1fr)', gap: '16px' }}>
           <MetricBadge icon={<Lock size={18} />} label={t('whatyouget.privacy')} value="100% Local" sub={t('whatyouget.privacySub')} />
           <MetricBadge icon={<WifiOff size={18} />} label={t('whatyouget.offline')} value="Always" sub={t('whatyouget.offlineSub')} />
           <MetricBadge icon={<Zap size={18} />} label={t('whatyouget.latency')} value="10-50ms" sub={t('whatyouget.latencySub')} />
@@ -166,7 +174,7 @@ export default function CloudVsLocal({ config }: Props) {
 
       {/* Subview toggle */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 40px', marginBottom: '32px' }}>
-        <div style={{ display: 'flex', gap: '4px', background: '#161412', borderRadius: '4px', padding: '4px', width: 'fit-content', border: '1px solid #2a2522' }}>
+        <div style={{ display: 'flex', gap: '4px', background: '#161412', borderRadius: '4px', padding: '4px', width: 'fit-content', border: '1px solid #2a2522', overflowX: 'auto' }}>
           <button onClick={() => setActiveSubview('models')} style={{ padding: '10px 20px', background: activeSubview === 'models' ? '#2a2522' : 'transparent', border: 'none', borderRadius: '4px', color: activeSubview === 'models' ? '#e8e2d9' : '#9c948a', fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Server size={14} /> {t('whatyouget.tabModels')} ({compatibleModels.length})
           </button>
@@ -198,13 +206,20 @@ export default function CloudVsLocal({ config }: Props) {
             </div>
 
             {/* Model Grid */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowX: 'auto' }}>
               {/* Header */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.4fr 0.7fr 0.3fr', gap: '16px', padding: '10px 20px', borderBottom: '1px solid #2a2522' }}>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isCompact ? '2fr 1fr 0.3fr' : '2fr 1fr 1.4fr 0.7fr 0.3fr',
+                gap: '16px',
+                padding: '10px 20px',
+                borderBottom: '1px solid #2a2522',
+                minWidth: isCompact ? '520px' : 'unset',
+              }}>
                 <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('whatyouget.model')}</span>
                 <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('whatyouget.inferenceSpeed')}</span>
-                <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('whatyouget.replacesCloud')}</span>
-                <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'right' }}>{t('whatyouget.savingsCol')}</span>
+                {!isCompact && <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{t('whatyouget.replacesCloud')}</span>}
+                {!isCompact && <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'right' }}>{t('whatyouget.savingsCol')}</span>}
                 <span style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', textAlign: 'center' }}></span>
               </div>
 
@@ -228,11 +243,14 @@ export default function CloudVsLocal({ config }: Props) {
                       className="cv-panel"
                       onClick={() => isCompatible && toggleExpand(model.id)}
                       style={{
-                        display: 'grid', gridTemplateColumns: '2fr 1fr 1.4fr 0.7fr 0.3fr', gap: '16px', alignItems: 'center',
+                        display: 'grid',
+                        gridTemplateColumns: isCompact ? '2fr 1fr 0.3fr' : '2fr 1fr 1.4fr 0.7fr 0.3fr',
+                        gap: '16px', alignItems: 'center',
                         padding: '14px 20px', background: isCompatible ? (isOpusClass ? '#1a2f1a' : isSonnetClass ? '#1c1a10' : '#161412') : '#0c0a09',
                         border: `1px solid ${isCompatible ? (isOpusClass ? '#2a4a2a' : isSonnetClass ? '#3d3020' : isCodingChampion ? '#3d3020' : '#2a2522') : '#1c1510'}`,
                         borderRadius: '4px', transition: 'all 0.2s ease', opacity: isCompatible ? 1 : 0.35,
                         cursor: isCompatible ? 'pointer' : 'default',
+                        minWidth: isCompact ? '520px' : 'unset',
                       }}
                       onMouseEnter={(e) => { if (isCompatible) e.currentTarget.style.borderColor = isOpusClass ? '#3a6a3a' : isSonnetClass ? '#5a4a30' : '#3d3630'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.borderColor = isCompatible ? (isOpusClass ? '#2a4a2a' : isSonnetClass ? '#3d3020' : '#2a2522') : '#1c1510'; }}
@@ -272,32 +290,36 @@ export default function CloudVsLocal({ config }: Props) {
                         </p>
                       </div>
 
-                      {/* Cloud Equivalent */}
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Cloud size={12} color="#c47070" />
-                          <span style={{ fontSize: '12px', color: '#c47070', fontWeight: 500 }}>{cloudEq.name}</span>
-                        </div>
-                        <p style={{ fontSize: '11px', color: '#8b7355', margin: '2px 0 0 16px' }}>{cloudEq.provider} · {cloudEq.price}</p>
-                      </div>
-
-                      {/* Savings */}
-                      <div style={{ textAlign: 'right' }}>
-                        {isCompatible ? (
+                      {!isCompact && (
+                        <>
+                          {/* Cloud Equivalent */}
                           <div>
-                            <p style={{ fontSize: '15px', fontWeight: 700, color: '#7cb87c', margin: 0 }}>
-                              ${monthlySaving}<span style={{ fontSize: '10px', fontWeight: 400 }}>/mo</span>
-                            </p>
-                            <a href={model.url} target="_blank" rel="noopener noreferrer"
-                              style={{ fontSize: '10px', color: '#8b7355', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}
-                              onClick={(e) => e.stopPropagation()}>
-                              <ExternalLink size={9} /> {model.source}
-                            </a>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <Cloud size={12} color="#c47070" />
+                              <span style={{ fontSize: '12px', color: '#c47070', fontWeight: 500 }}>{cloudEq.name}</span>
+                            </div>
+                            <p style={{ fontSize: '11px', color: '#8b7355', margin: '2px 0 0 16px' }}>{cloudEq.provider} · {cloudEq.price}</p>
                           </div>
-                        ) : (
-                          <p style={{ fontSize: '12px', color: '#8b7355', margin: 0 }}>Need +{model.vramRequired - vram}GB</p>
-                        )}
-                      </div>
+
+                          {/* Savings */}
+                          <div style={{ textAlign: 'right' }}>
+                            {isCompatible ? (
+                              <div>
+                                <p style={{ fontSize: '15px', fontWeight: 700, color: '#7cb87c', margin: 0 }}>
+                                  ${monthlySaving}<span style={{ fontSize: '10px', fontWeight: 400 }}>/mo</span>
+                                </p>
+                                <a href={model.url} target="_blank" rel="noopener noreferrer"
+                                  style={{ fontSize: '10px', color: '#8b7355', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '3px', marginTop: '2px' }}
+                                  onClick={(e) => e.stopPropagation()}>
+                                  <ExternalLink size={9} /> {model.source}
+                                </a>
+                              </div>
+                            ) : (
+                              <p style={{ fontSize: '12px', color: '#8b7355', margin: 0 }}>Need +{model.vramRequired - vram}GB</p>
+                            )}
+                          </div>
+                        </>
+                      )}
 
                       {/* Expand/collapse indicator */}
                       <div style={{ textAlign: 'center' }}>
@@ -318,7 +340,7 @@ export default function CloudVsLocal({ config }: Props) {
                         marginTop: '-6px',
                         marginBottom: '6px',
                       }}>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '16px' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: isCompact ? 'repeat(2, minmax(0, 1fr))' : 'repeat(5, 1fr)', gap: '16px' }}>
                           {/* Intelligence Index */}
                           <MetricBox
                             icon={<Brain size={14} />}
@@ -363,14 +385,14 @@ export default function CloudVsLocal({ config }: Props) {
                           background: '#0c0a09',
                           borderRadius: '4px',
                           display: 'grid',
-                          gridTemplateColumns: '1fr 1fr',
+                          gridTemplateColumns: isCompact ? '1fr' : '1fr 1fr',
                           gap: '20px',
                         }}>
                           <div>
                             <p style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>{t('metrics.yourSpeed')}</p>
                             <p style={{ fontSize: '18px', fontWeight: 700, color: '#7cb87c', margin: 0 }}>{tokensPerSec} <span style={{ fontSize: '11px', color: '#8b7355', fontWeight: 400 }}>tok/s</span></p>
                           </div>
-                          <div style={{ textAlign: 'right' }}>
+                          <div style={{ textAlign: isCompact ? 'left' : 'right' }}>
                             <p style={{ fontSize: '10px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 4px 0' }}>{t('metrics.yourPrice')}</p>
                             <p style={{ fontSize: '18px', fontWeight: 700, color: '#c9a96e', margin: 0 }}>$0</p>
                           </div>
@@ -397,7 +419,7 @@ export default function CloudVsLocal({ config }: Props) {
 
         {activeSubview === 'savings' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '40px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isCompact ? '1fr' : '1fr 1fr', gap: '20px', marginBottom: '40px' }}>
               <div className="cv-panel" style={{ padding: '24px', background: '#161412', border: '1px solid #2a2522', borderRadius: '4px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
                   <Cloud size={16} color="#c47070" />
@@ -426,10 +448,10 @@ export default function CloudVsLocal({ config }: Props) {
               </div>
             )}
 
-            <div className="cv-panel" style={{ background: '#161412', border: '1px solid #2a2522', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr', gap: '16px', padding: '14px 20px', background: '#0c0a09', borderBottom: '1px solid #2a2522' }}>
+            <div className="cv-panel" style={{ background: '#161412', border: '1px solid #2a2522', borderRadius: '4px', overflowX: 'auto' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isCompact ? '2fr 2fr' : '2fr 2fr 2fr', gap: '16px', padding: '14px 20px', background: '#0c0a09', borderBottom: '1px solid #2a2522', minWidth: isCompact ? '540px' : 'unset' }}>
                 <span style={{ fontSize: '11px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500 }}>Feature</span>
-                <span style={{ fontSize: '11px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500 }}>Cloud AI</span>
+                {!isCompact && <span style={{ fontSize: '11px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500 }}>Cloud AI</span>}
                 <span style={{ fontSize: '11px', color: '#8b7355', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500 }}>Mac Studio Local</span>
               </div>
               {[
@@ -443,14 +465,15 @@ export default function CloudVsLocal({ config }: Props) {
                 { feature: 'Concurrent Users', cloud: 'Rate limited, extra fees', local: 'Hardware-limited only', highlight: false },
               ].map((row) => (
                 <div key={row.feature} style={{
-                  display: 'grid', gridTemplateColumns: '2fr 2fr 2fr', gap: '16px', padding: '12px 20px',
+                  display: 'grid', gridTemplateColumns: isCompact ? '2fr 2fr' : '2fr 2fr 2fr', gap: '16px', padding: '12px 20px',
                   background: row.highlight ? '#141210' : 'transparent', borderBottom: '1px solid #1c1510',
+                  minWidth: isCompact ? '540px' : 'unset',
                 }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = '#1c1a17'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = row.highlight ? '#141210' : 'transparent'; }}
                 >
                   <span style={{ fontSize: '13px', fontWeight: 600, color: '#e8e2d9' }}>{row.feature}</span>
-                  <span style={{ fontSize: '13px', color: '#c47070', display: 'flex', alignItems: 'center', gap: '6px' }}><XCircle size={14} style={{ flexShrink: 0 }} />{row.cloud}</span>
+                  {!isCompact && <span style={{ fontSize: '13px', color: '#c47070', display: 'flex', alignItems: 'center', gap: '6px' }}><XCircle size={14} style={{ flexShrink: 0 }} />{row.cloud}</span>}
                   <span style={{ fontSize: '13px', color: '#7cb87c', display: 'flex', alignItems: 'center', gap: '6px' }}><CheckCircle2 size={14} style={{ flexShrink: 0 }} />{row.local}</span>
                 </div>
               ))}
