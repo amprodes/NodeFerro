@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { getShippingQuote } from '../_lib/pricing';
+import { getShippingQuote } from '../_lib/pricing.js';
 
 const schema = z.object({
   country: z.string().min(1),

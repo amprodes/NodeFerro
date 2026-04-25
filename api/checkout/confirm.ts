@@ -1,8 +1,8 @@
 import Stripe from 'stripe';
 import { Resend } from 'resend';
 import { z } from 'zod';
-import { decrementInventory, getOrderById, markOrderPaidById, markOrderPaidByPaymentIntent } from '../_lib/store';
-import { toSku } from '../_lib/pricing';
+import { decrementInventory, getOrderById, markOrderPaidById, markOrderPaidByPaymentIntent } from '../_lib/store.js';
+import { toSku } from '../_lib/pricing.js';
 
 const manualConfirmSchema = z.object({
   orderId: z.uuid().optional(),

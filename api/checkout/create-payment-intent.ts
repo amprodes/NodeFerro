@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
-import { checkoutRequestSchema, calculateOrderPricing } from '../_lib/pricing';
-import { createOrder, setOrderPaymentIntent } from '../_lib/store';
+import { checkoutRequestSchema, calculateOrderPricing } from '../_lib/pricing.js';
+import { createOrder, setOrderPaymentIntent } from '../_lib/store.js';
 
 function getStripe() {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -59,7 +59,10 @@ export default async function handler(req: any, res: any) {
       amount: pricing.grandTotalCents,
       currency: 'usd',
       receipt_email: body.shipping.email,
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never',
+      },
       metadata: {
         orderId: order.id,
         chipId: body.chipId,

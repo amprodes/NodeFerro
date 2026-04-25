@@ -1,4 +1,4 @@
-import { getOrderById } from '../_lib/store.js';
+import { getOrderById } from './_lib/store.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'GET') {
@@ -6,8 +6,8 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const id = req.query?.id;
-    if (!id || typeof id !== 'string') {
+    const id = typeof req.query?.id === 'string' ? req.query.id : null;
+    if (!id) {
       return res.status(400).json({ error: 'Missing order id' });
     }
 
