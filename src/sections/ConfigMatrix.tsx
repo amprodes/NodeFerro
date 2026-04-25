@@ -374,31 +374,6 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
                   <Sparkles size={12} /> Personal Shopper
                 </button>
               )}
-              {isCompactFooter && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowShopperTray((prev) => !prev);
-                    setShowCareMenu(false);
-                  }}
-                  aria-label="Toggle Personal Shopper"
-                  style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '6px',
-                    border: `1px solid ${showShopperTray ? '#c9a96e' : 'rgba(201,169,110,0.3)'}`,
-                    background: showShopperTray ? 'rgba(201,169,110,0.2)' : 'rgba(201,169,110,0.12)',
-                    color: '#c9a96e',
-                    cursor: 'pointer',
-                    marginLeft: '8px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Sparkles size={14} />
-                </button>
-              )}
             </div>
           </div>
 
@@ -485,28 +460,69 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
           ) : (
             <div className="footer-right" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
               {isCompactFooter ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowCareMenu((prev) => !prev);
-                    setShowShopperTray(false);
-                  }}
-                  aria-label="Toggle care plans"
-                  style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '6px',
-                    background: showCareMenu ? 'rgba(124,184,124,0.2)' : 'rgba(124,184,124,0.12)',
-                    border: `1px solid ${showCareMenu ? '#7cb87c' : 'rgba(124,184,124,0.3)'}`,
-                    color: '#7cb87c',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Lock size={15} />
-                </button>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'stretch',
+                  borderRadius: '6px',
+                  overflow: 'hidden',
+                  border: '1px solid #2a2522',
+                  background: '#161412',
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowShopperTray((prev) => !prev);
+                      setShowCareMenu(false);
+                    }}
+                    aria-label="Toggle personal shopper"
+                    style={{
+                      border: 'none',
+                      background: showShopperTray ? 'rgba(201,169,110,0.2)' : 'transparent',
+                      color: '#c9a96e',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      justifyContent: 'center',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    <Sparkles size={13} /> Personal
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCareMenu((prev) => !prev);
+                      setShowShopperTray(false);
+                    }}
+                    aria-label="Toggle care plans"
+                    style={{
+                      border: 'none',
+                      borderLeft: '1px solid #2a2522',
+                      background: showCareMenu ? 'rgba(124,184,124,0.2)' : 'transparent',
+                      color: '#7cb87c',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      justifyContent: 'center',
+                      padding: '8px 12px',
+                      cursor: 'pointer',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      letterSpacing: '0.04em',
+                      textTransform: 'uppercase',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    <Lock size={13} /> Care
+                  </button>
+                </div>
               ) : (
                 <div className="care-chips" style={{ display: 'flex', gap: '6px' }}>
                   {careTiers.map((tier) => {
@@ -608,20 +624,28 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
               {/* Divider */}
               {!isCompactFooter && <div style={{ width: '1px', height: '32px', background: '#2a2522', margin: '0 4px' }} />}
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-                <GlobalControls inline />
-
-                {/* Add to Bag */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                flexShrink: 0,
+                background: '#c9a96e',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                height: '52px',
+              }}>
                 <button onClick={() => setCheckoutOpen(true)} style={{
-                  padding: '14px 36px', background: '#c9a96e', color: '#0c0a09', border: 'none', borderRadius: '4px',
+                  height: '52px',
+                  padding: '0 30px', background: 'transparent', color: '#0c0a09', border: 'none',
                   fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s ease',
                   display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
                 }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = '#e8c78a'; e.currentTarget.style.transform = 'scale(1.02)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = '#c9a96e'; e.currentTarget.style.transform = 'scale(1)'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(12,10,9,0.08)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                 >
                   <ShoppingBag size={16} /> {t('footer.addToBag')}
                 </button>
+
+                <GlobalControls inline compound />
               </div>
             </div>
           )}

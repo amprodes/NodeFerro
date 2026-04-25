@@ -7,9 +7,10 @@ import type { Locale } from '../hooks/useTranslation';
 
 interface GlobalControlsProps {
   inline?: boolean;
+  compound?: boolean;
 }
 
-export default function GlobalControls({ inline = false }: GlobalControlsProps) {
+export default function GlobalControls({ inline = false, compound = false }: GlobalControlsProps) {
   const { locale, changeLocale, currency, setCurrency, t } = useAppContext();
   const [flashLang, setFlashLang] = useState<Locale | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,10 +27,11 @@ export default function GlobalControls({ inline = false }: GlobalControlsProps) 
       bottom: inline ? 'auto' : 'calc(14px + env(safe-area-inset-bottom, 0px))',
       right: inline ? 'auto' : '20px',
       zIndex: inline ? 2 : 9999,
-      display: 'flex',
+      display: compound ? 'block' : 'flex',
       flexDirection: 'column',
-      alignItems: 'flex-end',
-      gap: '8px',
+      alignItems: compound ? 'stretch' : 'flex-end',
+      gap: compound ? '0' : '8px',
+      height: compound ? '52px' : 'auto',
     }}>
       {menuOpen && (
         <div style={{
@@ -138,26 +140,37 @@ export default function GlobalControls({ inline = false }: GlobalControlsProps) 
         onClick={() => setMenuOpen((open) => !open)}
         aria-label="Open settings"
         style={{
-          width: '42px',
-          height: '42px',
-          borderRadius: '10px',
-          border: '1px solid #3d3630',
-          background: 'rgba(12,10,9,0.95)',
-          color: '#c9a96e',
+          width: compound ? '48px' : '42px',
+          height: compound ? '52px' : '42px',
+          borderRadius: compound ? '0' : '10px',
+          border: compound ? 'none' : '1px solid #3d3630',
+          borderLeft: compound ? '1px solid rgba(12,10,9,0.25)' : 'none',
+          background: compound ? 'transparent' : 'rgba(12,10,9,0.95)',
+          color: compound ? '#0c0a09' : '#c9a96e',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          padding: 0,
+          lineHeight: 1,
           cursor: 'pointer',
-          boxShadow: '0 8px 18px rgba(0,0,0,0.3)',
+          boxShadow: compound ? 'none' : '0 8px 18px rgba(0,0,0,0.3)',
           transition: 'all 0.2s ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = '#c9a96e';
-          e.currentTarget.style.transform = 'translateY(-1px)';
+          if (compound) {
+            e.currentTarget.style.background = 'rgba(12,10,9,0.08)';
+          } else {
+            e.currentTarget.style.borderColor = '#c9a96e';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = '#3d3630';
-          e.currentTarget.style.transform = 'translateY(0)';
+          if (compound) {
+            e.currentTarget.style.background = 'transparent';
+          } else {
+            e.currentTarget.style.borderColor = '#3d3630';
+            e.currentTarget.style.transform = 'translateY(0)';
+          }
         }}
       >
         {menuOpen ? <X size={18} /> : <Settings size={18} />}
