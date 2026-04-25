@@ -35,6 +35,7 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [shopperOpen, setShopperOpen] = useState(false);
   const [isCompactFooter, setIsCompactFooter] = useState(false);
+  const [isMobileFooter, setIsMobileFooter] = useState(false);
   const [showCareMenu, setShowCareMenu] = useState(false);
   const [showShopperTray, setShowShopperTray] = useState(false);
 
@@ -146,7 +147,9 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
   useEffect(() => {
     const onResize = () => {
       const compact = window.innerWidth <= 1023;
+      const mobile = window.innerWidth <= 767;
       setIsCompactFooter(compact);
+      setIsMobileFooter(mobile);
       if (!compact) {
         setShowCareMenu(false);
         setShowShopperTray(false);
@@ -346,16 +349,16 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
         display: 'flex', justifyContent: 'center',
       }}>
         <div className="sticky-footer-inner">
-          <div>
-            <p style={{ fontSize: '12px', color: '#8b7355', margin: '0 0 4px 0' }}>
+          <div className="footer-summary-block">
+            <p className="footer-summary-text" style={{ fontSize: '12px', color: '#8b7355', margin: '0 0 4px 0' }}>
               {chip.name} · {cores.cpu}-core CPU · {cores.gpu}-core GPU · {formatMemory(currentMemoryGB)} · {formatStorage(currentStorageGB)}{unitCount > 1 ? ` · ${unitCount} units` : ''}
               {selectedCare && ` · ${selectedCare === 'plus' ? 'Care+' : selectedCare === 'pro' ? 'Care Pro' : 'Care'}`}
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '24px', fontWeight: 600, color: '#e8e2d9' }}>
+            <div className="footer-price-row" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span className="footer-total-price" style={{ fontSize: '24px', fontWeight: 600, color: '#e8e2d9' }}>
                 {formatPrice(totalPrice)}
               </span>
-              {carePrice > 0 && <span style={{ fontSize: '14px', color: '#c9a96e' }}>+ {formatPrice(carePrice)}/yr {t('footer.care')}</span>}
+              {carePrice > 0 && <span className="footer-care-price" style={{ fontSize: '14px', color: '#c9a96e' }}>+ {formatPrice(carePrice)}/yr {t('footer.care')}</span>}
               {!isCompactFooter && !shopperOpen && (
                 <button
                   type="button"
@@ -630,14 +633,16 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
                 flexShrink: 0,
                 background: '#c9a96e',
                 borderRadius: '4px',
-                overflow: 'hidden',
-                height: '52px',
+                overflow: 'visible',
+                height: isMobileFooter ? '62px' : '52px',
+                maxWidth: '100%',
               }}>
                 <button onClick={() => setCheckoutOpen(true)} style={{
-                  height: '52px',
+                  height: isMobileFooter ? '65px' : '52px',
                   padding: '0 30px', background: 'transparent', color: '#0c0a09', border: 'none',
                   fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s ease',
                   display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
+                  whiteSpace: 'nowrap',
                 }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(12,10,9,0.08)'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
@@ -645,7 +650,7 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
                   <ShoppingBag size={16} /> {t('footer.addToBag')}
                 </button>
 
-                <GlobalControls inline compound />
+                <GlobalControls inline compound mobileCompound={isMobileFooter} />
               </div>
             </div>
           )}

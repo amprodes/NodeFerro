@@ -34,7 +34,9 @@ function AppContent() {
   return (
     <div style={{ background: '#0c0a09', minHeight: '100vh' }}>
       <FerrofluidHero />
-      <ChronosGallery />
+      <div className="chronos-gallery-shell">
+        <ChronosGallery />
+      </div>
       <ConfigMatrix onConfigChange={handleConfigChange} selectedCare={selectedCare} carePrice={selectedCare ? (
         selectedCare === 'plus' ? (config?.unitCount ?? 2) * 299 :
         selectedCare === 'pro' ? (config?.unitCount ?? 2) * 599 : 0

@@ -5,12 +5,36 @@ import { CURRENCIES } from '../hooks/useCurrency';
 import type { CurrencyCode } from '../hooks/useCurrency';
 import type { Locale } from '../hooks/useTranslation';
 
+function CompoundGearGlyph({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block' }}
+      aria-hidden="true"
+    >
+      <path
+        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.757.426 1.757 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.757-2.924 1.757-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.757-.426-1.757-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="12" r="3.2" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
 interface GlobalControlsProps {
   inline?: boolean;
   compound?: boolean;
+  mobileCompound?: boolean;
 }
 
-export default function GlobalControls({ inline = false, compound = false }: GlobalControlsProps) {
+export default function GlobalControls({ inline = false, compound = false, mobileCompound = false }: GlobalControlsProps) {
   const { locale, changeLocale, currency, setCurrency, t } = useAppContext();
   const [flashLang, setFlashLang] = useState<Locale | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -31,7 +55,7 @@ export default function GlobalControls({ inline = false, compound = false }: Glo
       flexDirection: 'column',
       alignItems: compound ? 'stretch' : 'flex-end',
       gap: compound ? '0' : '8px',
-      height: compound ? '52px' : 'auto',
+      height: compound ? (mobileCompound ? '72px' : '52px') : 'auto',
     }}>
       {menuOpen && (
         <div style={{
@@ -45,6 +69,10 @@ export default function GlobalControls({ inline = false, compound = false }: Glo
           border: '1px solid #2a2522',
           borderRadius: '8px',
           boxShadow: '0 14px 34px rgba(0,0,0,0.35)',
+          position: compound ? 'absolute' : 'relative',
+          right: 0,
+          bottom: compound ? 'calc(100% + 8px)' : 'auto',
+          zIndex: 30,
         }}>
           <div style={{
             display: 'flex',
@@ -140,16 +168,20 @@ export default function GlobalControls({ inline = false, compound = false }: Glo
         onClick={() => setMenuOpen((open) => !open)}
         aria-label="Open settings"
         style={{
-          width: compound ? '48px' : '42px',
-          height: compound ? '52px' : '42px',
+          width: compound ? (mobileCompound ? '32px' : '52px') : '42px',
+          height: compound ? (mobileCompound ? '72px' : '52px') : '42px',
           borderRadius: compound ? '0' : '10px',
           border: compound ? 'none' : '1px solid #3d3630',
-          borderLeft: compound ? '1px solid rgba(12,10,9,0.25)' : 'none',
+          borderTop: compound ? 'none' : undefined,
+          borderRight: compound ? 'none' : undefined,
+          borderBottom: compound ? 'none' : undefined,
+          borderLeft: compound ? '1px solid rgba(12,10,9,0.25)' : undefined,
           background: compound ? 'transparent' : 'rgba(12,10,9,0.95)',
           color: compound ? '#0c0a09' : '#c9a96e',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          position: 'relative',
           padding: 0,
           lineHeight: 1,
           cursor: 'pointer',
@@ -173,7 +205,25 @@ export default function GlobalControls({ inline = false, compound = false }: Glo
           }
         }}
       >
-        {menuOpen ? <X size={18} /> : <Settings size={18} />}
+        <span style={{
+          position: 'absolute',
+          top: compound && mobileCompound ? '58%' : '50%',
+          left: compound && mobileCompound ? '63%' : '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
+          width: compound && mobileCompound ? '20px' : '18px',
+          height: compound && mobileCompound ? '20px' : '18px',
+          transform: 'translate(-50%, -50%)',
+          pointerEvents: 'none',
+        }}>
+          {menuOpen ? (
+            <X size={compound && mobileCompound ? 20 : 18} style={{ display: 'block' }} />
+          ) : (
+            compound ? <CompoundGearGlyph size={compound && mobileCompound ? 20 : 18} /> : <Settings size={18} style={{ display: 'block' }} />
+          )}
+        </span>
       </button>
     </div>
   );

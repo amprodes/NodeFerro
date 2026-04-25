@@ -119,7 +119,7 @@ export default function FerrofluidHero() {
       </div>
 
       {/* Hero section */}
-      <section ref={heroRef} style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', background: '#0c0a09' }}>
+      <section ref={heroRef} style={{ position: 'relative', width: '100%', height: '100vh', overflow: 'hidden', background: '#0c0a09' }}>
         {/* Rack image — right half */}
         <div className="hero-image-wrap" style={{
           position: 'absolute',
