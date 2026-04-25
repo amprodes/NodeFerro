@@ -262,6 +262,21 @@ html {
     gap: 6px !important;
   }
 
+  .shopper-choice-strip {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .shopper-choice-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .shopper-choice-strip > button {
+    flex: 0 0 auto;
+  }
+
   .checkout-modal {
     max-width: 100vw !important;
     max-height: 100vh !important;

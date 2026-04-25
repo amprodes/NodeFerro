@@ -150,7 +150,7 @@ export default function PersonalShopper({ onAction, onClose }: PersonalShopperPr
           }}>
             <Compass size={12} color="#8b7355" style={{ flexShrink: 0 }} />
             {step.type === 'choice' && step.choices ? (
-              <div style={{ display: 'flex', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <div className="shopper-choice-strip" style={{ display: 'flex', gap: '4px', flex: 1, minWidth: 0, overflow: 'hidden' }}>
                 {step.choices.map((c) => (
                   <button
                     key={c.value}
