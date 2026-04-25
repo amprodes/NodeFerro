@@ -461,7 +461,7 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
               onClose={() => setShopperOpen(false)}
             />
           ) : (
-            <div className="footer-right" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+            <div className="footer-right footer-action-row" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
               {isCompactFooter ? (
                 <div style={{
                   display: 'flex',
@@ -627,7 +627,7 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
               {/* Divider */}
               {!isCompactFooter && <div style={{ width: '1px', height: '32px', background: '#2a2522', margin: '0 4px' }} />}
 
-              <div style={{
+              <div className="footer-cta-compound" style={{
                 display: 'flex',
                 alignItems: 'stretch',
                 flexShrink: 0,
