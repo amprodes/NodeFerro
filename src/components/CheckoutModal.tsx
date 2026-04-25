@@ -145,8 +145,6 @@ export default function CheckoutModal({ isOpen, onClose, config, selectedCare, c
   const [initializingPayment, setInitializingPayment] = useState(false);
   const { t, formatPrice } = useAppContext();
 
-  if (!isOpen || !config) return null;
-
   const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY as string | undefined;
   const stripePromise = useMemo(() => {
     if (!stripePublishableKey) {
@@ -155,6 +153,8 @@ export default function CheckoutModal({ isOpen, onClose, config, selectedCare, c
 
     return loadStripe(stripePublishableKey);
   }, [stripePublishableKey]);
+
+  if (!isOpen || !config) return null;
 
   const apiBase = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
   const apiUrl = (path: string) => `${apiBase}${path}`;
