@@ -53,12 +53,29 @@ let pool: Pool | null = null;
 let schemaReady = false;
 
 function getPool() {
-  if (!process.env.DATABASE_URL) {
+  const connectionString = process.env.DATABASE_URL || process.env.SUPABASE_DB_URL;
+  if (!connectionString) {
     return null;
   }
 
   if (!pool) {
-    pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const usesSslModeRequire = /sslmode=require/i.test(connectionString);
+    const normalizedConnectionString = connectionString
+      .replace(/([?&])sslmode=[^&]*(&?)/i, (_, lead, tail) => {
+        if (lead === '?' && tail) {
+          return '?';
+        }
+        if (lead === '&' && tail) {
+          return '&';
+        }
+        return '';
+      })
+      .replace(/[?&]$/, '');
+
+    pool = new Pool({
+      connectionString: normalizedConnectionString,
+      ssl: usesSslModeRequire ? { rejectUnauthorized: false } : undefined,
+    });
   }
 
   return pool;

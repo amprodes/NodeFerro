@@ -92,6 +92,13 @@ html {
   .floating-nav {
     padding: 8px 10px !important;
   }
+  .floating-nav-inner {
+    gap: 8px !important;
+  }
+  .floating-nav .nav-buttons {
+    flex: 1;
+    justify-content: flex-start !important;
+  }
 
   section h2 {
     font-size: 28px !important;

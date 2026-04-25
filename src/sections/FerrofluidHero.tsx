@@ -93,7 +93,15 @@ export default function FerrofluidHero() {
         justifyContent: 'center',
         pointerEvents: navFloating ? 'auto' : 'none',
       }}>
-        <div className="floating-nav-inner">
+        <div className="floating-nav-inner" style={{
+          width: '100%',
+          maxWidth: '1200px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          flexWrap: 'nowrap',
+        }}>
           {/* Brand */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
             <NodeIcon size={22} />
@@ -101,7 +109,7 @@ export default function FerrofluidHero() {
           </div>
 
           {/* Nav buttons */}
-          <div className="nav-buttons" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div className="nav-buttons" style={{ display: 'flex', gap: '8px', flexWrap: 'nowrap', justifyContent: 'center', overflowX: 'auto' }}>
             {renderNavButtons(true)}
           </div>
 

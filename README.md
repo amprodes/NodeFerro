@@ -42,6 +42,30 @@ Set these in Vercel Project Settings -> Environment Variables:
 - `RESEND_API_KEY`
 - `ORDER_FROM_EMAIL`
 - `VITE_API_URL` (optional; leave empty for same-origin calls)
+- `VITE_STRIPE_PUBLISHABLE_KEY` (required for live card capture in browser)
+
+## Supabase Connection Setup
+
+Use Supabase as your Postgres provider for this project.
+
+1. Open Supabase Dashboard -> Project Settings -> Database.
+2. Copy the connection string from `Connection string` (`URI` or `Transaction pooler`).
+3. Set it in Vercel as either:
+	 - `DATABASE_URL` (preferred in this project), or
+	 - `SUPABASE_DB_URL`
+
+Notes:
+
+- Do not put your Supabase URL or anon key in this backend, it uses direct Postgres.
+- Keep the DB variable server-side only (Vercel env vars, not client code).
+
+## Where To Find Key Variables
+
+- `VITE_API_URL`:
+	- Vercel production: leave empty.
+	- Local Vite hitting deployed backend: set to your deployed site, e.g. `https://your-app.vercel.app`.
+- `VITE_STRIPE_PUBLISHABLE_KEY`:
+	- Stripe Dashboard -> Developers -> API keys -> `Publishable key` (`pk_live_...` or `pk_test_...`).
 
 ## GitHub + Vercel Deployment
 
