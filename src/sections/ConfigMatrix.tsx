@@ -12,6 +12,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import CheckoutModal from '../components/CheckoutModal';
 import ClusterGraph from '../components/ClusterGraph';
 import PersonalShopper from '../components/PersonalShopper';
+import GlobalControls from '../components/GlobalControls';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -607,17 +608,21 @@ export default function ConfigMatrix({ onConfigChange, selectedCare, carePrice =
               {/* Divider */}
               {!isCompactFooter && <div style={{ width: '1px', height: '32px', background: '#2a2522', margin: '0 4px' }} />}
 
-              {/* Add to Bag */}
-              <button onClick={() => setCheckoutOpen(true)} style={{
-                padding: '14px 36px', background: '#c9a96e', color: '#0c0a09', border: 'none', borderRadius: '4px',
-                fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s ease',
-                display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
-              }}
-                onMouseEnter={(e) => { e.currentTarget.style.background = '#e8c78a'; e.currentTarget.style.transform = 'scale(1.02)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = '#c9a96e'; e.currentTarget.style.transform = 'scale(1)'; }}
-              >
-                <ShoppingBag size={16} /> {t('footer.addToBag')}
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                <GlobalControls inline />
+
+                {/* Add to Bag */}
+                <button onClick={() => setCheckoutOpen(true)} style={{
+                  padding: '14px 36px', background: '#c9a96e', color: '#0c0a09', border: 'none', borderRadius: '4px',
+                  fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 0.2s ease',
+                  display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0,
+                }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#e8c78a'; e.currentTarget.style.transform = 'scale(1.02)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = '#c9a96e'; e.currentTarget.style.transform = 'scale(1)'; }}
+                >
+                  <ShoppingBag size={16} /> {t('footer.addToBag')}
+                </button>
+              </div>
             </div>
           )}
         </div>

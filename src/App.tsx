@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import './App.css';
 import { AppProvider } from './hooks/useAppContext';
-import GlobalControls from './components/GlobalControls';
 import FerrofluidHero from './sections/FerrofluidHero';
 import ChronosGallery from './sections/ChronosGallery';
 import ConfigMatrix from './sections/ConfigMatrix';
@@ -34,7 +33,6 @@ function AppContent() {
 
   return (
     <div style={{ background: '#0c0a09', minHeight: '100vh' }}>
-      <GlobalControls />
       <FerrofluidHero />
       <ChronosGallery />
       <ConfigMatrix onConfigChange={handleConfigChange} selectedCare={selectedCare} carePrice={selectedCare ? (

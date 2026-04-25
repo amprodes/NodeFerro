@@ -5,7 +5,11 @@ import { CURRENCIES } from '../hooks/useCurrency';
 import type { CurrencyCode } from '../hooks/useCurrency';
 import type { Locale } from '../hooks/useTranslation';
 
-export default function GlobalControls() {
+interface GlobalControlsProps {
+  inline?: boolean;
+}
+
+export default function GlobalControls({ inline = false }: GlobalControlsProps) {
   const { locale, changeLocale, currency, setCurrency, t } = useAppContext();
   const [flashLang, setFlashLang] = useState<Locale | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,10 +22,10 @@ export default function GlobalControls() {
 
   return (
     <div className="global-controls" style={{
-      position: 'fixed',
-      bottom: 'calc(14px + env(safe-area-inset-bottom, 0px))',
-      right: '20px',
-      zIndex: 9999,
+      position: inline ? 'relative' : 'fixed',
+      bottom: inline ? 'auto' : 'calc(14px + env(safe-area-inset-bottom, 0px))',
+      right: inline ? 'auto' : '20px',
+      zIndex: inline ? 2 : 9999,
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'flex-end',
